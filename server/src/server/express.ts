@@ -4,11 +4,11 @@ import jwt from 'jsonwebtoken'
 declare module 'express' {
   export interface Request {
     cookies: Cookies
-    userId?: number
-    clientId: number
-    clientIds?: number[]
-    isAuthenticated: boolean
-    isClientUser: boolean
+    userId: number | undefined
+    groupIds: number[] | undefined // groups you are authenticated with
+    roleId: number  | undefined // admin view or member view
+    isGroupMember: boolean // if req.groupId, does jwt match
+    isAuthenticated: boolean // does userId exist in jwt, logged in
   }
 }
 
@@ -46,29 +46,27 @@ export function authentication(
     // no-op
   }
 
-  const requestClientId: number | undefined = req.body.clientId || undefined
+  const requestedGroupId: number | undefined = req.body.clientId || undefined
   req.userId = jwtData?.userId
-  req.clientId = jwtData?.clientId || 0
-  req.clientIds = jwtData?.clientIds
+  req.groupIds = jwtData?.groupIds
+  req.roleId = jwtData?.roleId
   req.isAuthenticated = !!jwtData?.userId
-  req.isClientUser = !requestClientId || requestClientId === jwtData?.clientId
+  req.isGroupMember = jwtData?.groupIds && requestedGroupId ? jwtData.groupIds.includes(requestedGroupId) : false
   next()
 }
 
 export type JWTClaims = {
   userId: number
+  groupIds: number[]
   roleId?: number
-  clientId?: number
-  clientIds?: number[] // for users with multiple clients
   issuer: string
   permissions: string
 }
 
 export type JWT = {
   userId: number
+  groupIds: number[]
   roleId: number
-  clientId?: number
-  clientIds?: number[]
   issuer?: string
   permissions?: string
   iat?: number
@@ -76,22 +74,19 @@ export type JWT = {
 }
 export function generateToken({
   userId,
-  clientId,
-  clientIds,
+  groupIds,
   roleId,
 }: {
   userId: number
-  clientId?: number
-  clientIds?: number[]
+  groupIds?: number[]
   roleId?: number
 }): JWT {
   const EXPIRES_IN = 7 * 24 * 60 * 60 // 1 week in seconds
   const claims: JWTClaims = {
     userId: userId,
+    groupIds: groupIds || [],
     roleId: roleId,
-    clientId: clientId,
-    clientIds: clientIds,
-    issuer: `teamautomate`,
+    issuer: `korock`,
     permissions: `all`,
   }
 

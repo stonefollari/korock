@@ -51,7 +51,7 @@ accountRouter.post('/createAccount', async (req, res) => {
       return
     }
 
-    const token = generateToken({ userId: newUser.id })
+    const token = generateToken({ userId: newUser.id, groupIds: []})
     res.cookie('token', token, { httpOnly: true })
     res.status(200).send(success(token))
     // TODO: add JWT token creation, return
@@ -97,27 +97,13 @@ accountRouter.post('/login', async (req, res) => {
 
   let token = {}
   // is super admin
-  if (superAdmin) {
-    token = generateToken({
-      userId,
-      roleId: ROLES.SUPER_ADMIN,
-    })
-    // user has multiple client roles
-  } else if (members.length > 1) {
+  if (members.length > 1) {
     const groupIds = members.map((member) => member.groupId) // get groupIds
     token = generateToken({
       userId,
-      clientIds: groupIds,
+      groupIds: groupIds,
     })
     // just one client
-  } else if (members.length === 1) {
-    const member = members[0]
-    token = generateToken({
-      userId,
-      clientId: member.groupId,
-      roleId: member.roleId,
-    })
-    // no client
   } else {
     token = generateToken({
       userId,
@@ -136,36 +122,30 @@ accountRouter.post('/logout', async (req, res) => {
 })
 
 interface ClientLoginInput {
-  clientLoginId: number // not named clientId to avoid apiAuth handler to prevent request.
+  groupLoginId: number // not named clientId to avoid apiAuth handler to prevent request.
 }
-/* API:account.clientLogin */
-accountRouter.post('/clientLogin', async (req: Request, res: Response) => {
-  const { clientLoginId } = req.body as ClientLoginInput
+/* API:account.groupLogin */
+accountRouter.post('/groupLogin', async (req: Request, res: Response) => {
+  const { groupLoginId } = req.body as ClientLoginInput
   const userId = req.userId
 
-  if (!userId || !clientLoginId) {
+  if (!userId || !groupLoginId) {
     res.status(200).send(fail('Invalid attempt to log in to client.'))
     return
   }
   const superAdmin = await isSuperAdmin(userId)
   const members = await getMembers(userId)
-  const member = members.find((role) => role.groupId === clientLoginId)
+  const groupIds = members.map((member) => member.groupId)
+  const roleId = members.find((member) => member.groupId === groupLoginId)?.roleId
   let token = {}
 
   // if has client attempting to log in to
-  if (superAdmin) {
+  if (members.length) {
     // sign in to that client
     token = generateToken({
       userId,
-      clientId: clientLoginId,
-      roleId: ROLES.SUPER_ADMIN,
-    })
-  } else if (member) {
-    // sign in to that client
-    token = generateToken({
-      userId,
-      clientId: member.groupId,
-      roleId: member.roleId,
+      groupIds: groupIds,
+      roleId: roleId,
     })
   } else {
     res.status(200).send(fail('Attempted to sign in to invalid client.'))

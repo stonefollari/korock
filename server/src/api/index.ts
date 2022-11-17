@@ -29,7 +29,7 @@ export const fail = (message = '', data?: unknown | undefined): APIResult => ({
 export const apiRouter = express.Router()
 
 export function apiAuth(req: Request, res: Response, next: NextFunction): void {
-  if (!req.clientId || !req.isClientUser) {
+  if (!req.groupIds?.length || !req.isGroupMember) {
     res.status(401).send(fail('Unauthorized.'))
     return
   } else {
