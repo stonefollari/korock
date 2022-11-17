@@ -7,7 +7,7 @@ export default function Homepage(): JSX.Element {
     <div>
       <Grid container>
         <Grid item xs={12}>
-          <Typography variant="h6"></Typography>
+          <Typography variant="h6">Homepage</Typography>
         </Grid>
       </Grid>
     </div>
