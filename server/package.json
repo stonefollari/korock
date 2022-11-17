@@ -4,13 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "npm run migrate && npx tsc",
+    "ci-build": "npx tsc",
     "start": "npm run serve",
     "serve": "node dist/server",
-    "build": "npx tsc",
-    "new-migration": "knex migrate:make",
+    "build-serve": "npm run build && npm run serve",
+    "dev": "nodemon src/server.ts",
+    "test": "jest --verbose --forceExit --detectOpenHandles  --watchAll",
     "migrate": "knex migrate:latest",
     "rollback": "knex migrate:rollback",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "seed": "knex seed:run",
+    "reset-db": "npm run rollback && npm run migrate && npm run seed",
+    "start-db": "sudo pg_ctlcluster 14 main start",
+    "lint": "eslint src/* --fix"
   },
   "repository": {
     "type": "git",

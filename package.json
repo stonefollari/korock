@@ -4,7 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "cd server && npm run start",
+    "build": "npm run build-server && npm run build-client",
+    "ci-build": "cd server && npm run ci-build && cd .. && npm run build-client",
+    "build-server": "cd server && npm run build && cd ..",
+    "build-client": "cd client && npm run build && cd ..",
+    "postinstall": "cd server && npm install && cd ../client && npm install && cd ..",
+    "migrate": "cd server && npm run migrate && cd ..",
+    "rollback": "cd server && npm run rollback && cd ..",
+    "seed": "cd server && npm run seed && cd .."
   },
   "repository": {
     "type": "git",
@@ -26,5 +34,13 @@
     "jsonwebtoken": "^8.5.1",
     "prettier": "^2.2.1",
     "typescript": "^4.8.4"
+  },
+  "prettier": {
+    "semi": false,
+    "trailingComma": "all",
+    "singleQuote": true,
+    "tabWidth": 2,
+    "printWidth": 80,
+    "endOfLine": "auto"
   }
 }

@@ -31,9 +31,9 @@ exports.up = async (knex) => {
   await knex.raw(`
     CREATE TABLE IF NOT EXISTS "Members" (
       "id" SERIAL PRIMARY KEY,
-      "userId" INTEGER  NOT NULL REFERENCES "Users" ("id") ON DELETE CASCADE,
-      "groupId" INTEGER  NOT NULL REFERENCES "Groups" ("id") ON DELETE CASCADE,
-      "roleId" INTEGER  NOT NULL REFERENCES,
+      "userId" INTEGER NOT NULL REFERENCES "Users" ("id") ON DELETE CASCADE,
+      "groupId" INTEGER NOT NULL REFERENCES "Groups" ("id") ON DELETE CASCADE,
+      "roleId" INTEGER NOT NULL,
       "active" BOOLEAN NOT NULL DEFAULT TRUE,
       "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       "updatedAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -86,6 +86,7 @@ exports.up = async (knex) => {
       "name" VARCHAR(255),
       "message" TEXT,
       "messageType" VARCHAR(255),
+      "anonymous" BOOLEAN,
       "active" BOOLEAN NOT NULL DEFAULT TRUE,
       "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       "updatedAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
