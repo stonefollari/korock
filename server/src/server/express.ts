@@ -6,7 +6,7 @@ declare module 'express' {
     cookies: Cookies
     userId: number | undefined
     groupIds: number[] | undefined // groups you are authenticated with
-    roleId: number  | undefined // admin view or member view
+    roleId: number | undefined // admin view or member view
     isGroupMember: boolean // if req.groupId, does jwt match
     isAuthenticated: boolean // does userId exist in jwt, logged in
   }
@@ -51,7 +51,10 @@ export function authentication(
   req.groupIds = jwtData?.groupIds
   req.roleId = jwtData?.roleId
   req.isAuthenticated = !!jwtData?.userId
-  req.isGroupMember = jwtData?.groupIds && requestedGroupId ? jwtData.groupIds.includes(requestedGroupId) : false
+  req.isGroupMember =
+    jwtData?.groupIds && requestedGroupId
+      ? jwtData.groupIds.includes(requestedGroupId)
+      : false
   next()
 }
 

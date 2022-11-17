@@ -1,6 +1,6 @@
 import { knex } from '../../server'
 import { err } from '../../utils/functions'
-import { User, Member, ROLES, DataFields } from '../../database/types'
+import { User, Member, ROLES, ObjectFields } from '../../database/types'
 
 /**
  * Fetches user based on email
@@ -19,10 +19,7 @@ export async function getUser(
     : ['id', 'email', 'name']
 
   try {
-    return knex
-      .first<User>(attributes)
-      .from('Users')
-      .where({ email })
+    return knex.first<User>(attributes).from('Users').where({ email })
   } catch (e) {
     err(e)
   }
@@ -34,7 +31,7 @@ export async function getUser(
  * @param options unsafe: fetches all fields, including pass
  * @returns User | undefined
  */
- export async function getUserById(
+export async function getUserById(
   id: string,
   options?: { unsafe: boolean },
 ): Promise<User | undefined> {
@@ -45,10 +42,7 @@ export async function getUser(
     : ['id', 'email', 'name']
 
   try {
-    return knex
-      .first<User>(attributes)
-      .from('Users')
-      .where({ id })
+    return knex.first<User>(attributes).from('Users').where({ id })
   } catch (e) {
     err(e)
   }
@@ -78,11 +72,33 @@ export async function createUser(
   }
 }
 
-export async function getMembers(
-  userId: number,
-  ): Promise<Member[]> {
+export async function deleteUser(userId: number): Promise<number | undefined> {
   try {
-    return await knex.select<Member[]>('*').from('Members').where({userId})
+    return await knex('Users').where({ id: userId }).del()
+  } catch (e) {
+    err(e)
+  }
+}
+
+export async function updateUser(
+  user: ObjectFields<User>,
+): Promise<User | undefined> {
+  try {
+    return await knex
+      .insert(user)
+      .into('Users')
+      .onConflict(['id', 'email'])
+      .merge()
+      .returning<User[]>('*')
+      .then((rows) => rows[0])
+  } catch (e) {
+    err(e)
+  }
+}
+
+export async function getMembers(userId: number): Promise<Member[]> {
+  try {
+    return await knex.select<Member[]>('*').from('Members').where({ userId })
   } catch (e) {
     err(e)
     return []

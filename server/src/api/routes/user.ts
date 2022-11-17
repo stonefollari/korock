@@ -5,11 +5,15 @@ import {
   sha256,
   validEmail,
 } from '../../utils/functions'
-import { fail, message, success } from '../'
+import { fail, message, success } from '.'
 import { generateToken } from '../../server/express'
-import { Group, ROLES } from '../../database/types'
-import { createUser, getMembers, getUser, isSuperAdmin } from '../resolvers/users'
-import { getGroups } from '../resolvers/groups'
+import { Group } from '../../database/types'
+import {
+  createUser,
+  getMembers,
+  getUser,
+  // isSuperAdmin,
+} from '../resolvers/users'
 
 const accountRouter = express.Router()
 
@@ -51,7 +55,7 @@ accountRouter.post('/createAccount', async (req, res) => {
       return
     }
 
-    const token = generateToken({ userId: newUser.id, groupIds: []})
+    const token = generateToken({ userId: newUser.id, groupIds: [] })
     res.cookie('token', token, { httpOnly: true })
     res.status(200).send(success(token))
     // TODO: add JWT token creation, return
@@ -92,7 +96,7 @@ accountRouter.post('/login', async (req, res) => {
     return
   }
 
-  const superAdmin = await isSuperAdmin(user.id)
+  // const superAdmin = await isSuperAdmin(user.id)
   const members = await getMembers(user.id)
 
   let token = {}
@@ -133,10 +137,12 @@ accountRouter.post('/groupLogin', async (req: Request, res: Response) => {
     res.status(200).send(fail('Invalid attempt to log in to client.'))
     return
   }
-  const superAdmin = await isSuperAdmin(userId)
+  // const superAdmin = await isSuperAdmin(userId)
   const members = await getMembers(userId)
   const groupIds = members.map((member) => member.groupId)
-  const roleId = members.find((member) => member.groupId === groupLoginId)?.roleId
+  const roleId = members.find(
+    (member) => member.groupId === groupLoginId,
+  )?.roleId
   let token = {}
 
   // if has client attempting to log in to
@@ -165,10 +171,10 @@ accountRouter.get('/getUserClients', async (req: Request, res: Response) => {
     return
   }
 
-  const superAdmin = await isSuperAdmin(userId)
-  const clientIds = (await getMembers(userId)).map((member) => member.groupId)
+  // const superAdmin = await isSuperAdmin(userId)
+  // const clientIds = (await getMembers(userId)).map((member) => member.groupId)
 
-  let groups: Group[] | undefined = undefined
+  const groups: Group[] | undefined = undefined
   // groups = await getGroups(clientId)
 
   return res.status(200).send(success(groups))
