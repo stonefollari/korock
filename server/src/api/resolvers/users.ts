@@ -15,11 +15,15 @@ export async function getUser(
   if (!email) return undefined
 
   const attributes = options?.unsafe
-    ? ['id', 'email', 'name', 'salt', 'pass']
+    ? ['id', 'email', 'name', 'salt', 'password']
     : ['id', 'email', 'name']
 
   try {
-    return knex.first<User>(attributes).from('Users').where({ email })
+    const cleanedEmail = cleanEmail(email)
+    return knex
+      .first<User>(attributes)
+      .from('Users')
+      .where({ email: cleanedEmail })
   } catch (e) {
     err(e)
   }
@@ -65,6 +69,7 @@ export async function createUser(
   user: Pick<User, 'email' | 'password' | 'salt'>,
 ): Promise<User | undefined> {
   try {
+    user.email = cleanEmail(user.email) // clean email
     await knex.insert(user).into('Users')
     return getUser(user.email)
   } catch (e) {
@@ -84,6 +89,7 @@ export async function updateUser(
   user: ObjectFields<User>,
 ): Promise<User | undefined> {
   try {
+    user.email = cleanEmail(user.email) // clean email
     return await knex
       .insert(user)
       .into('Users')
@@ -103,4 +109,8 @@ export async function getMembers(userId: number): Promise<Member[]> {
     err(e)
     return []
   }
+}
+
+function cleanEmail(email: string): string {
+  return email.toLowerCase()
 }

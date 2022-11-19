@@ -1,4 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express'
+import userRouter from './user'
 
 export type APIResult = {
   success: boolean
@@ -37,6 +38,8 @@ export function apiAuth(req: Request, res: Response, next: NextFunction): void {
   }
 }
 
-apiRouter.get('/helloWorld', async (req, res) => {
-  res.send('hello world')
+apiRouter.use('/user', userRouter)
+
+apiRouter.get('/ping', async (req, res) => {
+  res.send('pong')
 })
