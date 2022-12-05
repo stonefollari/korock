@@ -6,7 +6,7 @@ import Submission from './Submission'
 import Comment from './Comment'
 
 // remove typical database fields that do not contain "data" about the type
-export type DataFields<T> = Omit<T, 'id' | 'active' | 'createdAt' | 'updatedAt'>
+export type DataFields<T> = Omit<ObjectFields<T>, 'id'>
 export type ObjectFields<T> = Omit<T, 'active' | 'createdAt' | 'updatedAt'>
 
 export enum ROLES {

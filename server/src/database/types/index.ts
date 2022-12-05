@@ -1,6 +1,7 @@
 import User from './User'
 import Group from './Group'
 import Member from './Member'
+import BlockMember from './BlockMember'
 import Block from './Block'
 import Submission from './Submission'
 import Comment from './Comment'
@@ -17,4 +18,4 @@ export enum ROLES {
   GUEST = 5,
 }
 
-export { User, Group, Member, Block, Submission, Comment }
+export { User, Group, Member, BlockMember, Block, Submission, Comment }

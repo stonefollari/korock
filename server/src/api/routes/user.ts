@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express'
+import express from 'express'
 import {
   createSalt,
   passwordsMatch,
@@ -7,8 +7,8 @@ import {
 } from '../../utils/functions'
 import { fail, message, success } from '.'
 import { generateToken } from '../../server/express'
-import { createUser, getMembers, getUser } from '../resolvers/users'
-import { getGroups } from '../resolvers/groups'
+import { createUser, getUser } from '../resolvers/users'
+import { getUserMembers } from '../resolvers/members'
 
 const userRouter = express.Router()
 
@@ -87,16 +87,13 @@ userRouter.post('/login', async (req, res) => {
   const salt = user.salt
 
   const inputHashPassword = await sha256(password + salt)
-  console.log(hashPassword)
-  console.log(password + salt)
-  console.log(inputHashPassword)
   if (!passwordsMatch(hashPassword, inputHashPassword)) {
     res.status(200).send(fail('Incorrect password.'))
     return
   }
 
   // const superAdmin = await isSuperAdmin(user.id)
-  const members = await getMembers(user.id)
+  const members = await getUserMembers(user.id)
 
   let token = {}
   // is super admin
@@ -121,18 +118,6 @@ userRouter.post('/login', async (req, res) => {
 userRouter.post('/logout', async (req, res) => {
   res.clearCookie('token')
   res.status(200).send(message('Successfully logged out.'))
-})
-
-userRouter.get('/getGroups', async (req: Request, res: Response) => {
-  const userId = req.userId
-
-  if (!userId) {
-    res.status(403).send(fail('Must be logged in.'))
-    return
-  }
-
-  const groups = await getGroups(userId)
-  return res.status(200).send(success(groups))
 })
 
 export default userRouter

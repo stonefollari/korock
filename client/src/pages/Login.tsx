@@ -10,8 +10,8 @@ import AppContext, { JWT } from '../app/AppContext'
 import { isValidEmail } from '../utils/functions'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
-import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
+import TopBar from '../components/common/TopBar'
 
 export default function Login(): JSX.Element {
   const { appReducer } = useContext(AppContext)
@@ -54,7 +54,7 @@ export default function Login(): JSX.Element {
         const jwtData = jwt.decode(result.data || '') as JWT
         appReducer({ type: 'jwt', payload: jwtData })
 
-        navigate('/homepage')
+        navigate('/dashboard')
       } else {
         setAlert({
           open: true,
@@ -88,7 +88,7 @@ export default function Login(): JSX.Element {
         const jwtData = jwt.decode(result.data || '') as JWT
         appReducer({ type: 'jwt', payload: jwtData })
 
-        navigate('/homepage')
+        navigate('/dashboard')
       } else {
         setAlert({
           open: true,
@@ -100,13 +100,13 @@ export default function Login(): JSX.Element {
   }
 
   return (
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      minHeight="100vh"
+    <div
+      style={{
+        width: '100%',
+      }}
     >
-      <Container>
+      <TopBar />
+      <Container sx={{ mt: 4 }}>
         <Grid container spacing={2} justifyContent="center">
           {isLogin ? (
             <>
@@ -197,6 +197,6 @@ export default function Login(): JSX.Element {
           onClose={() => setAlert({ ...alert, open: false })}
         />
       </Container>
-    </Box>
+    </div>
   )
 }

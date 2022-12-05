@@ -101,3 +101,22 @@ export const isValidPassword = (pw: string): boolean => {
 export const passwordsMatch = (pw: string, checkPw: string): boolean => {
   return pw === checkPw
 }
+
+export const stringColor = (str: string) => {
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  let colour = '#'
+  for (let i = 0; i < 3; i++) {
+    const value = (hash >> (i * 8)) & 0xff
+    colour += ('00' + value.toString(16)).substr(-2)
+  }
+  return colour
+}
+
+export function range(range: number): number[] {
+  return Array(range)
+    .fill(0)
+    .map((zero, i) => i)
+}

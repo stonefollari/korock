@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 // Add additional properties to the Request type from express.
+
 declare module 'express' {
   export interface Request {
     cookies: Cookies

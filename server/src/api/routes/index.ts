@@ -1,5 +1,8 @@
 import express, { NextFunction, Request, Response } from 'express'
 import userRouter from './user'
+import groupRouter from './group'
+import blockRouter from './block'
+import memberRouter from './members'
 
 export type APIResult = {
   success: boolean
@@ -39,6 +42,9 @@ export function apiAuth(req: Request, res: Response, next: NextFunction): void {
 }
 
 apiRouter.use('/user', userRouter)
+apiRouter.use('/member', memberRouter)
+apiRouter.use('/group', groupRouter)
+apiRouter.use('/block', blockRouter)
 
 apiRouter.get('/ping', async (req, res) => {
   res.send('pong')

@@ -29,6 +29,34 @@ export async function getUser(
   }
 }
 
+export async function getUsers(emails: string[]): Promise<User[] | undefined> {
+  if (!emails.length) return undefined
+
+  try {
+    return knex
+      .select<User[]>(['id', 'name', 'email'])
+      .from('Users')
+      .whereIn('email', emails)
+  } catch (e) {
+    err(e)
+  }
+}
+
+export async function getUsersById(
+  userIds: number[],
+): Promise<User[] | undefined> {
+  if (!userIds.length) return undefined
+
+  try {
+    return knex
+      .select<User[]>(['id', 'name', 'email'])
+      .from('Users')
+      .whereIn('id', userIds)
+  } catch (e) {
+    err(e)
+  }
+}
+
 /**
  * Fetches user based on email
  * @param id
@@ -99,15 +127,6 @@ export async function updateUser(
       .then((rows) => rows[0])
   } catch (e) {
     err(e)
-  }
-}
-
-export async function getMembers(userId: number): Promise<Member[]> {
-  try {
-    return await knex.select<Member[]>('*').from('Members').where({ userId })
-  } catch (e) {
-    err(e)
-    return []
   }
 }
 
