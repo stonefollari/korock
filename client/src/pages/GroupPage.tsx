@@ -12,9 +12,9 @@ import { Block, Group } from '../api/types'
 import BlockCard from '../components/BlockCard'
 import TopBar from '../components/common/TopBar'
 import { err, range } from '../utils/functions'
-import AddBlock from '../components/AddBlock'
 import { DAY_MS } from '../utils/constants'
 import { format } from 'date-fns'
+import CreateBlockModal from '../components/CreateBlockModal'
 
 export default function GroupPage(): JSX.Element {
   const { groupId: groupIdParam } = useParams<{
@@ -24,8 +24,14 @@ export default function GroupPage(): JSX.Element {
 
   const [group, setGroup] = useState<Group>()
   const [blocks, setBlocks] = useState<Block[]>([])
-
+  const [open, setOpen] = useState<boolean>(false)
   const [week, setWeek] = useState<Date[]>(getWeek(getMonday()))
+  const [fetchBlocks, setFetchBlocks] = useState<number>(0)
+
+  const handleClose = () => {
+    setFetchBlocks(fetchBlocks + 1)
+    setOpen(false)
+  }
 
   const handleNextWeek = () => {
     const lastDay = week[week.length - 1]
@@ -47,7 +53,7 @@ export default function GroupPage(): JSX.Element {
         }
       })
       .catch((e) => err(e))
-  }, [])
+  }, [fetchBlocks])
 
   useEffect(() => {
     if (groupId) {
@@ -127,7 +133,7 @@ export default function GroupPage(): JSX.Element {
                           <BlockCard block={block} />
                         </Grid>
                       ))}
-                    <AddBlock />
+                    <AddBlock onClick={() => setOpen(true)} />
                   </Grid>
                 </Grid>
               </Grid>
@@ -139,6 +145,7 @@ export default function GroupPage(): JSX.Element {
           <Grid container justifyContent="center" spacing={3}></Grid>
         </Container>
       </Container>
+      <CreateBlockModal open={open} onClose={handleClose}></CreateBlockModal>
     </div>
   )
 }
@@ -184,4 +191,21 @@ const compareDate = (a: number | undefined, b: number | undefined) => {
   const dateA = new Date(a)
   const dateB = new Date(b)
   return dateB.getTime() - dateA.getTime()
+}
+
+function AddBlock({ onClick }: { onClick: () => void }): JSX.Element {
+  return (
+    <Grid item xs={12}>
+      <Grid container justifyContent="center">
+        <Button
+          variant="outlined"
+          onClick={() => onClick()}
+          size="small"
+          sx={{ borderRadius: 50, minWidth: 0, width: 30.75 }}
+        >
+          +
+        </Button>
+      </Grid>
+    </Grid>
+  )
 }
