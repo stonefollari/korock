@@ -70,8 +70,8 @@ export async function getUserById(
   if (!id) return undefined
 
   const attributes = options?.unsafe
-    ? ['id', 'email', 'name', 'salt', 'pass']
-    : ['id', 'email', 'name']
+    ? ['id', 'email', 'name', 'biography', 'nickname', 'phone', 'salt', 'pass']
+    : ['id', 'email', 'name', 'biography', 'nickname', 'phone']
 
   try {
     return knex.first<User>(attributes).from('Users').where({ id })

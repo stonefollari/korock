@@ -1,5 +1,6 @@
 import instance, { APIResult } from '.'
 import { err, getResult, sha256 } from '../utils/functions'
+import { User } from './types'
 
 export async function createAccount(
   email: string,
@@ -39,4 +40,15 @@ export async function logout(): Promise<APIResult<string>> {
     .post('/api/user/logout')
     .catch((e) => err(e))
     .then((res) => getResult<string>(res))
+}
+
+export async function getUserById(userId: number): Promise<APIResult<User>> {
+  return instance
+    .get(`/api/user/getUserById`, {
+      params: {
+        userId,
+      },
+    })
+    .catch((e) => err(e))
+    .then((res) => getResult<User>(res))
 }

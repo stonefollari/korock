@@ -51,6 +51,10 @@ export default function TopBar(): JSX.Element {
     navigate(`/dashboard`)
   }
 
+  const handleProfile = async () => {
+    navigate(`/profile/${userId}`)
+  }
+
   return (
     <AppBar position="static" sx={{ height: '50px' }}>
       <Toolbar variant="dense" sx={{ height: '50px' }}>
@@ -124,9 +128,7 @@ export default function TopBar(): JSX.Element {
               onClose={handleClose}
             >
               <MenuItem onClick={handleDashboard}>Dashboard</MenuItem>
-              <MenuItem onClick={handleClose} disabled>
-                Profile
-              </MenuItem>
+              <MenuItem onClick={handleProfile}>Profile</MenuItem>
               <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
           </div>

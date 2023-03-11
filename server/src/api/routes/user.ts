@@ -7,7 +7,7 @@ import {
 } from '../../utils/functions'
 import { fail, message, success } from '.'
 import { generateToken } from '../../server/express'
-import { createUser, getUser } from '../resolvers/users'
+import { createUser, getUser, getUserById } from '../resolvers/users'
 import { getUserMembers } from '../resolvers/members'
 
 const userRouter = express.Router()
@@ -117,6 +117,19 @@ userRouter.post('/login', async (req, res) => {
 userRouter.post('/logout', async (req, res) => {
   res.clearCookie('token')
   res.status(200).send(message('Successfully logged out.'))
+})
+
+userRouter.get('/getUserById', async (req, res) => {
+  const userId = parseInt(req.query.userId as string)
+  const user = await getUserById(userId)
+
+  if (user) {
+    res.send(success(user))
+    return
+  } else {
+    res.send(fail('No User found.'))
+    return
+  }
 })
 
 export default userRouter

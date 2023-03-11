@@ -31,7 +31,7 @@ export default function AppRouter(): JSX.Element {
           <Route path="/createBlock" element={<CreateBlock />} />
           <Route path="/group/:groupId" element={<GroupPage />} />
           <Route path="/block/:blockId" element={<BlockPage />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/:userId" element={<Profile />} />
           <Route path="/login" element={<Login />} />
           <Route path="/joinGroup/:groupId" element={<JoinGroup />} />
         </Routes>
