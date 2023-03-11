@@ -6,6 +6,7 @@ import CreateBlock from '../pages/CreateBlock'
 import CreateGroup from '../pages/CreateGroup'
 import Dashboard from '../pages/Dashboard'
 import GroupPage from '../pages/GroupPage'
+import JoinGroup from '../pages/JoinGroup'
 import Login from '../pages/Login'
 import Profile from '../pages/Profile'
 // import { AuthRoute } from './AuthRoute'
@@ -32,6 +33,7 @@ export default function AppRouter(): JSX.Element {
           <Route path="/block/:blockId" element={<BlockPage />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/joinGroup/:groupId" element={<JoinGroup />} />
         </Routes>
       </div>
     </Router>

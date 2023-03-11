@@ -18,6 +18,16 @@ export async function getGroup(
   return group
 }
 
+export async function getGroupPreview(
+  groupId: number,
+  token: string,
+): Promise<APIResult<Group | undefined>> {
+  const group = await instance
+    .get(`/api/group/getGroupPreview?groupId=${groupId}&token=${token}`)
+    .then((res) => getResult<Group>(res))
+  return group
+}
+
 export type SetGroup = Omit<DataFields<Group | undefined>, 'userId'>
 export async function setGroup(
   group: SetGroup,

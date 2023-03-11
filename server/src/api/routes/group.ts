@@ -1,7 +1,12 @@
 import express, { Request, Response } from 'express'
 import { fail, success } from '.'
 import { DataFields, Group, Member } from '../../database/types'
-import { getGroup, getGroups, setGroup } from '../resolvers/groups'
+import {
+  getGroup,
+  getGroupPreview,
+  getGroups,
+  setGroup,
+} from '../resolvers/groups'
 
 const groupRouter = express.Router()
 
@@ -32,9 +37,20 @@ groupRouter.get('/getGroup', async (req: Request, res: Response) => {
   return
 })
 
+groupRouter.get('/getGroupPreview', async (req: Request, res: Response) => {
+  const userId = req.userId
+  const token = req.query.token as string
+  const groupId = parseInt(req.query.groupId as string)
+
+  const group = await getGroupPreview(groupId, token, userId)
+  res.status(200).send(success(group))
+  return
+})
+
 interface SetGroupInput {
   group: Omit<DataFields<Group | undefined>, 'userId'>
   members: Pick<DataFields<Member>, 'userId' | 'roleId'>[]
+  invites: Pick<DataFields<Member>, 'userId' | 'roleId'>[]
 }
 groupRouter.post('/setGroup', async (req: Request, res: Response) => {
   const userId = req.userId
@@ -45,7 +61,7 @@ groupRouter.post('/setGroup', async (req: Request, res: Response) => {
     return
   }
 
-  const newGroup = await setGroup(groupWithUser, members)
+  const newGroup = await setGroup(groupWithUser, members, [])
   res.status(200).send(success(newGroup))
   return
 })

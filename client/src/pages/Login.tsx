@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import jwt from 'jsonwebtoken'
 import Grid from '@mui/material/Grid'
 import TextField from '@mui/material/TextField'
@@ -14,6 +14,10 @@ import Stack from '@mui/material/Stack'
 import TopBar from '../components/common/TopBar'
 
 export default function Login(): JSX.Element {
+  const useQuery = () => new URLSearchParams(useLocation().search)
+  const query = useQuery()
+  const redir = query.get('redir')
+
   const { appReducer } = useContext(AppContext)
   const navigate = useNavigate()
   const [alert, setAlert] = useState<AlertInput>({ open: false })
@@ -54,7 +58,11 @@ export default function Login(): JSX.Element {
         const jwtData = jwt.decode(result.data || '') as JWT
         appReducer({ type: 'jwt', payload: jwtData })
 
-        navigate('/dashboard')
+        if (redir) {
+          navigate(redir)
+        } else {
+          navigate('/dashboard')
+        }
       } else {
         setAlert({
           open: true,

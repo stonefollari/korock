@@ -1,5 +1,5 @@
 import { knex } from '../../server'
-import { err } from '../../utils/functions'
+import { createSalt, err } from '../../utils/functions'
 
 import { DataFields, Member, User } from '../../database/types'
 
@@ -75,4 +75,45 @@ export async function getUserMembers(userId: number): Promise<Member[]> {
     err(e)
     return []
   }
+}
+
+export async function confirmMember(
+  userId: number,
+  groupId: number,
+  token: string,
+): Promise<boolean> {
+  // set confirmed to true where
+  const updated = await knex('Members').update({ confirmed: true }).where({
+    userId,
+    groupId,
+    token,
+  })
+
+  return !!updated
+}
+
+export async function revokeInvite(
+  userId: number,
+  groupId: number,
+): Promise<void> {
+  await knex('Members')
+    .update({ token: undefined })
+    .where({
+      userId,
+      groupId,
+    })
+    .del()
+}
+
+export async function updateInvite(
+  userId: number,
+  groupId: number,
+): Promise<void> {
+  await knex('Members')
+    .update({ token: createSalt() })
+    .where({
+      userId,
+      groupId,
+    })
+    .del()
 }

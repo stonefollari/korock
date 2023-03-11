@@ -28,6 +28,8 @@ export default function GroupPage(): JSX.Element {
   const [week, setWeek] = useState<Date[]>(getWeek(getMonday()))
   const [fetchBlocks, setFetchBlocks] = useState<number>(0)
 
+  const [tab, setTab] = useState()
+
   const handleClose = () => {
     setFetchBlocks(fetchBlocks + 1)
     setOpen(false)
@@ -53,7 +55,7 @@ export default function GroupPage(): JSX.Element {
         }
       })
       .catch((e) => err(e))
-  }, [fetchBlocks])
+  }, [fetchBlocks, groupId])
 
   useEffect(() => {
     if (groupId) {
@@ -67,7 +69,7 @@ export default function GroupPage(): JSX.Element {
         })
         .catch((e) => err(e))
     }
-  }, [])
+  }, [groupId])
 
   return (
     <div
@@ -118,7 +120,7 @@ export default function GroupPage(): JSX.Element {
                   >
                     <Box sx={{ p: 1, textAlign: 'center' }}>
                       <Typography variant="body2">
-                        {format(day, 'MM/dd')}
+                        <strong>{format(day, 'eee MM/dd')}</strong>
                       </Typography>
                     </Box>
                   </Paper>
@@ -162,7 +164,8 @@ const getMonday = (): Date => {
   const day = date.getDay() // Sunday - Saturday : 0 - 6
   //  Day of month - day of week (-6 if Sunday), otherwise +1
   const diff = date.getDate() - day + (day === 0 ? -6 : 1)
-  return date.setDate(diff), date
+  date.setDate(diff)
+  return date
 }
 
 const sameDay = (d1: number | undefined, date2: Date) => {

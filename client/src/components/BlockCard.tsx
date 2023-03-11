@@ -4,6 +4,7 @@ import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import { Block } from '../api/types'
 import { useNavigate } from 'react-router-dom'
+import Grid from '@mui/material/Grid'
 
 export default function BlockCard({ block }: { block: Block }): JSX.Element {
   const navigate = useNavigate()
@@ -18,11 +19,13 @@ export default function BlockCard({ block }: { block: Block }): JSX.Element {
       elevation={0}
       variant="outlined"
     >
-      <CardContent>
-        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-          {block.name}
+      <CardContent sx={{ p: 1 }}>
+        <Grid container justifyContent="center">
+          <Typography gutterBottom>{block.name}</Typography>
+        </Grid>
+        <Typography variant="body2" color="text.secondary">
+          {block.details}
         </Typography>
-        <Typography variant="body2">{block.details}</Typography>
       </CardContent>
     </Card>
   )

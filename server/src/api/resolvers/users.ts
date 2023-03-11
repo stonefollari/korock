@@ -64,7 +64,7 @@ export async function getUsersById(
  * @returns User | undefined
  */
 export async function getUserById(
-  id: string,
+  id: number,
   options?: { unsafe: boolean },
 ): Promise<User | undefined> {
   if (!id) return undefined

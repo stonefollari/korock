@@ -13,8 +13,7 @@ import TextField, { TextFieldProps } from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { SetBlock, setBlock } from '../api/block'
 import { getGroups } from '../api/group'
-import { Group } from '../api/types'
-import TopBar from '../components/common/TopBar'
+import { Block, Group } from '../api/types'
 import { err, wait } from '../utils/functions'
 import { format } from 'date-fns'
 import { DesktopDatePicker } from '@mui/x-date-pickers'
@@ -24,7 +23,6 @@ import { DAY_MS } from '../utils/constants'
 import { TimePicker } from '@mui/x-date-pickers/TimePicker'
 import Box from '@mui/material/Box'
 import Alert, { AlertInput, handleAlert } from '../components/Alert'
-import { useNavigate } from 'react-router-dom'
 import { Autocomplete, FormHelperText } from '@mui/material'
 import { GetMember, getMembers } from '../api/members'
 import useMediaQuery from '@mui/material/useMediaQuery'
@@ -34,28 +32,37 @@ import Dialog from '@mui/material/Dialog'
 export interface CreateBlockModalProps {
   open: boolean
   onClose: () => void
+  edit?: Block
 }
 
 export default function CreateBlockModal({
   open,
   onClose,
+  edit,
 }: CreateBlockModalProps): JSX.Element {
-  const navigate = useNavigate()
+  const editDate = edit?.date ? new Date(edit.date) : defaultTime
+
   const [alert, setAlert] = useState<AlertInput>({ open: false })
   const [groups, setGroups] = useState<Group[]>([])
   const [members, setMembers] = useState<GetMember[]>()
   const [selectedGroupId, setSelectedGroupId] = useState<number | undefined>()
-  const [name, setName] = useState<string>('')
-  const [isPublic, setIsPublic] = useState<boolean>(true)
-  const [date, setDate] = useState<Date>()
-  const [time, setTime] = useState<Date>(defaultTime)
-  const [meetingUrl, setMeetingUrl] = useState<string>('')
-  const [videoUrl, setVideoUrl] = useState<string>('')
-  const [imageUrl, setImageUrl] = useState<string>('')
-  const [details, setDetails] = useState<string>('')
-  const [allowSubmission, setAllowSubmission] = useState<boolean>(false)
-  const [allowComment, setAllowComment] = useState<boolean>(false)
-  const [allowAnonymous, setAllowAnonymous] = useState<boolean>(false)
+  const [name, setName] = useState<string>(edit?.name || '')
+  const [isPublic, setIsPublic] = useState<boolean>(edit?.isPublic || true)
+  const [date, setDate] = useState<Date>(editDate)
+  const [time, setTime] = useState<Date>(editDate)
+  const [meetingUrl, setMeetingUrl] = useState<string>(edit?.meetingUrl || '')
+  const [videoUrl, setVideoUrl] = useState<string>(edit?.videoUrl || '')
+  const [imageUrl, setImageUrl] = useState<string>(edit?.imageUrl || '')
+  const [details, setDetails] = useState<string>(edit?.details || '')
+  const [allowSubmission, setAllowSubmission] = useState<boolean>(
+    edit?.allowSubmission || false,
+  )
+  const [allowComment, setAllowComment] = useState<boolean>(
+    edit?.allowComment || false,
+  )
+  const [allowAnonymous, setAllowAnonymous] = useState<boolean>(
+    edit?.allowAnonymous || false,
+  )
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'))
 
@@ -92,6 +99,15 @@ export default function CreateBlockModal({
       return
     }
 
+    if (!name) {
+      setAlert({
+        open: true,
+        severity: 'warning',
+        message: 'Block must have a name.',
+      })
+      return
+    }
+
     const dateTime = new Date(date || new Date())
     dateTime.setHours(time.getHours())
     dateTime.setMinutes(time.getMinutes())
@@ -117,7 +133,11 @@ export default function CreateBlockModal({
 
     setBlock(block, blockMembers)
       .then(async (res) => {
-        handleAlert(setAlert, res, 'Successfully created block. Redirecting...')
+        handleAlert(
+          setAlert,
+          res,
+          `Successfully ${edit ? 'updated' : 'created'} block. Redirecting...`,
+        )
         await wait(1000)
         onClose()
       })
@@ -147,13 +167,14 @@ export default function CreateBlockModal({
             width: '100%',
           }}
         >
-          <TopBar />
           <Container sx={{ mt: 4 }}>
             {groups.length ? (
               <Grid container justifyContent="center" spacing={3}>
                 <Grid item xs={12}>
                   <Grid container justifyContent="center">
-                    <Typography variant="h5">Create Block</Typography>
+                    <Typography variant="h5">
+                      {edit ? 'Edit' : 'Create'} Block
+                    </Typography>
                   </Grid>
                 </Grid>
                 <Grid item xs={12}>
@@ -331,6 +352,7 @@ export default function CreateBlockModal({
                           control={
                             <Checkbox
                               value={allowSubmission}
+                              checked={allowSubmission}
                               onChange={() =>
                                 setAllowSubmission(!allowSubmission)
                               }
@@ -342,7 +364,13 @@ export default function CreateBlockModal({
                           control={
                             <Checkbox
                               value={allowComment}
-                              onChange={() => setAllowComment(!allowComment)}
+                              checked={allowComment}
+                              onChange={() => {
+                                if (allowComment) {
+                                  setAllowAnonymous(false)
+                                }
+                                setAllowComment(!allowComment)
+                              }}
                             />
                           }
                           label="Comments"
@@ -351,6 +379,7 @@ export default function CreateBlockModal({
                           <FormControlLabel
                             control={
                               <Checkbox
+                                checked={allowAnonymous}
                                 value={allowAnonymous}
                                 onChange={() =>
                                   setAllowAnonymous(!allowAnonymous)
@@ -368,7 +397,7 @@ export default function CreateBlockModal({
                           Cancel
                         </Button>
                         <Button variant="contained" onClick={handleSubmit}>
-                          Create
+                          {edit ? 'Update' : 'Create'}
                         </Button>
                       </Grid>
                     </Grid>

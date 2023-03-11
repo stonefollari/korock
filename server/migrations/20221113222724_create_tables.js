@@ -38,6 +38,11 @@ exports.up = async (knex) => {
       "userId" INTEGER NOT NULL REFERENCES "Users" ("id") ON DELETE CASCADE,
       "groupId" INTEGER NOT NULL REFERENCES "Groups" ("id") ON DELETE CASCADE,
       "roleId" INTEGER NOT NULL,
+      "confirmed" BOOLEAN NOT NULL DEFAULT FALSE,
+      "token" VARCHAR(255),
+      "email" VARCHAR(255),
+      "invited" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      "joined" TIMESTAMP,
       "active" BOOLEAN NOT NULL DEFAULT TRUE,
       "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       "updatedAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -107,7 +112,7 @@ exports.up = async (knex) => {
       "active" BOOLEAN NOT NULL DEFAULT TRUE,
       "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       "updatedAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      UNIQUE("name", "groupId")
+      UNIQUE("groupId")
     );
   `)
 

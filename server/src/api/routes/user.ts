@@ -42,7 +42,6 @@ userRouter.post('/createAccount', async (req, res) => {
       password: hashPassword,
       salt,
     })
-    console.log(salt)
 
     if (!newUser) {
       res

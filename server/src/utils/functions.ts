@@ -21,10 +21,6 @@ export function log(msg: string): void {
   console.log(msg)
 }
 
-export function invalidResponse(string: string): void {
-  console.log(`${string} - Did not return a valid response`)
-}
-
 export function isDefined<T>(input: T | undefined): input is T {
   return input !== undefined && input !== null
 }
@@ -200,19 +196,6 @@ export function isLikeAny(
     .some((alike) => alike === true)
 }
 
-export function adjustPrice(itemPrice: string | undefined): number {
-  const MIN_PRICE = 10
-  const MAX_PRICE = 20000
-  const PRICE_MULTIPLYER = 1.2
-
-  // get number and add modifier
-  const adjustedPrice = Math.max(
-    (parseFloat(itemPrice || `${MAX_PRICE}`) || MAX_PRICE) * PRICE_MULTIPLYER,
-    MIN_PRICE,
-  )
-  return round(round(adjustedPrice, -1) - 0.01, 2) // round to nearest 10 dollars, minus a penny
-}
-
 export function norm(str: string | undefined): string {
   return str?.toLowerCase()?.trim() || ''
 }
@@ -230,10 +213,6 @@ export function single(rawStr = ''): string {
   }
 
   return str
-}
-
-export function extractAttribute(str: string): string | undefined {
-  return str?.match(/^\s*{\s*(.*?)\s*}\s*$/i)?.[1]
 }
 
 export function split(str: string | undefined, delim = ' '): string[] {

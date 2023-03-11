@@ -14,11 +14,18 @@ export async function setBlock(
         .insert(block)
         .into('Blocks')
         .returning<Block[]>('*')
-        .onConflict(['name', 'groupId'])
+        .onConflict('groupId')
         .merge()
         .then((rows) => rows[0])
 
-      if (insertedBlock && blockMembers.length) {
+      if (insertedBlock) {
+        // remove existing if there are
+        await trx('BlockMembers')
+          .where({
+            'BlockMembers.blockId': insertedBlock.id,
+          })
+          .del()
+
         const users = await getUsersById(blockMembers)
         const insertBlockMembers = users?.map(
           (u): DataFields<BlockMember> => ({
@@ -52,8 +59,13 @@ export async function getBlock(
       .leftJoin('Members', 'Members.groupId', 'Blocks.groupId')
       .leftJoin('BlockMembers', 'BlockMembers.blockId', 'Blocks.id')
       .where({ 'Blocks.id': blockId, 'Blocks.userId': userId }) // owner
-      .orWhere({ 'Members.userId': userId, isPublic: true }) // public and in group
       .orWhere({
+        'Blocks.id': blockId,
+        'Members.userId': userId,
+        isPublic: true,
+      }) // public and in group
+      .orWhere({
+        'Blocks.id': blockId,
         'Members.userId': userId,
         'BlockMembers.userId': userId,
       }) // block member

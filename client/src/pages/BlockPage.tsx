@@ -1,28 +1,36 @@
+import React, { useEffect, useState } from 'react'
+import { Typography } from '@mui/material'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Container from '@mui/material/Container'
 import Grid from '@mui/material/Grid'
 import TextField from '@mui/material/TextField'
-import React, { useEffect, useState } from 'react'
+import { format } from 'date-fns'
 import { useParams } from 'react-router-dom'
 import { getBlock } from '../api/block'
 import { Block } from '../api/types'
 import TopBar from '../components/common/TopBar'
 import Component from '../components/Component'
 import { err } from '../utils/functions'
+import { useContext } from 'react'
+import AppContext from '../app/AppContext'
+import CreateBlockModal from '../components/CreateBlockModal'
 
 export default function BlockPage(): JSX.Element {
   const { blockId: blockIdParam } = useParams<{
     blockId?: string | undefined
   }>()
   const blockId = blockIdParam ? parseInt(blockIdParam) : 0
+  const { appState } = useContext(AppContext)
+  const [block, setBlock] = useState<Block | undefined>()
+  const [editModalOpen, setEditModalOpen] = useState<boolean>(false)
+  const isOwner = block && block.userId === appState.user.id
 
-  const [block, setBlock] = useState<Block>()
   useEffect(() => {
     if (blockId) {
       getBlock(blockId)
         .then((res) => {
-          if (res.success) {
+          if (res.success && res.data) {
             setBlock(res.data)
           } else {
             console.log(res.message)
@@ -31,6 +39,16 @@ export default function BlockPage(): JSX.Element {
         .catch((e) => err(e))
     }
   }, [blockId])
+
+  const handleEdit = () => {
+    // open edit modal
+    setEditModalOpen(true)
+  }
+
+  const handleEditClose = () => {
+    // open edit modal
+    setEditModalOpen(false)
+  }
 
   const getEmbedUrl = (url?: string): string | undefined => {
     if (!url) {
@@ -60,6 +78,29 @@ export default function BlockPage(): JSX.Element {
       <Container sx={{ mt: 4 }}>
         <Component title={block.name}>
           <Grid container justifyContent="center" spacing={4}>
+            <Grid item xs={12}>
+              {isOwner && (
+                <Button variant="contained" onClick={handleEdit}>
+                  Edit
+                </Button>
+              )}
+            </Grid>
+            <Grid item xs={12}>
+              <Grid container justifyContent="center">
+                <Grid item xs={12}>
+                  <Typography variant="body2">Group {block.groupId}</Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography variant="body2">
+                    {block.date && format(new Date(block.date), 'h:mma')}
+                  </Typography>
+                  <Typography variant="body2">
+                    {block.date &&
+                      format(new Date(block.date), 'eeee MMM dd, yyyy')}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Grid>
             {block.videoUrl && getEmbedUrl(block.videoUrl) ? (
               <Grid item xs={12}>
                 <Grid container justifyContent="center">
@@ -132,19 +173,34 @@ export default function BlockPage(): JSX.Element {
                 </Grid>
               </Grid>
             ) : null}
-            <Grid item xs={12}>
-              Submissions: {block.allowSubmission ? 'Yes' : 'No'}
-            </Grid>
-            <Grid item xs={12}>
-              Comments: {block.allowComment ? 'Yes' : 'No'}
-            </Grid>
-            <Grid item xs={12}>
-              Anonymous: {block.allowAnonymous ? 'Yes' : 'No'}
-            </Grid>
+            {block.allowSubmission && (
+              <Grid item xs={12}>
+                <Grid container justifyContent="center">
+                  <Typography variant="h6">Submissions</Typography>
+                </Grid>
+                <Typography>Submissions are currently unavailable.</Typography>
+              </Grid>
+            )}
+
+            {block.allowComment && (
+              <Grid item xs={12}>
+                <Grid container justifyContent="center">
+                  <Typography variant="h6">
+                    {block.allowAnonymous ? 'Anonymous ' : ''}Comments
+                  </Typography>
+                </Grid>
+                <Typography>Comments are currently unavailable.</Typography>
+              </Grid>
+            )}
           </Grid>
         </Component>
       </Container>
       <Box p={30}></Box>
+      <CreateBlockModal
+        open={editModalOpen}
+        onClose={handleEditClose}
+        edit={block}
+      />
     </div>
   )
 }

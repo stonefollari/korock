@@ -12,3 +12,12 @@ export async function getMembers(
     .then((res) => getResult<GetMember[]>(res))
   return members
 }
+
+export async function confirmMember(
+  groupId: number,
+  token: string,
+): Promise<APIResult<boolean>> {
+  return await instance
+    .post('/api/member/confirmMember', { groupId, token })
+    .then((res) => getResult<boolean>(res))
+}
